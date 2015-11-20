@@ -1,0 +1,11 @@
+{
+    "name": "website-api-lambda-contact",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "aws-sdk"       : "*",
+        "validator"     : "*",
+        "url"           : "*",
+        "html-entities" : "*"
+    }
+}
