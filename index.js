@@ -3,26 +3,35 @@ var validator = require('validator');
 var url       = require('url');
 var Entities  = require('html-entities').XmlEntities;
 entities      = new Entities();
+var urlencode = require('urlencode');
             
 exports.handler = function(event, context) {
     console.log("Request received:\n", JSON.stringify(event));
     console.log("Context received:\n", JSON.stringify(context));
-    
+        
     var email = {};
-    email.TargetArn = "arn:aws:sns:us-east-1:073338330571:justinfox";
+    
+    if (validator.isEmail(urlencode.decode(event.urlencoded.fromemail))){
+        var fromemail = urlencode.decode(event.urlencoded.fromemail);
+    }
+    var from = urlencode.decode(event.urlencoded.from.split('+').join('%20'));
+    var subject = urlencode.decode(event.urlencoded.subject.split('+').join('%20'));
+    var message = urlencode.decode(event.urlencoded.message.split('+').join('%20'));
+    
+    email.TargetArn = "arn:aws:sns:{{REGION}}:{{ACCOUNTID}}:{{NAME}}";
     email.Subject = "Message from "
-            + validator.escape(event.from)
-            + " on justinfox.me :: "
-            + validator.escape(event.subject);
+            + from
+            + " on {{WEBSITE}} :: "
+            + subject;
     email.Message = "Subject: "
-            + validator.escape(event.subject)
+            + subject
             + "\n\n"
-            + entities.decode(validator.escape(event.message))
+            + message
             + "\n\n"
             + "- "
-            + validator.escape(event.from)
+            + from
             + "\n  ("
-            + validator.escape(event.email || event.fromemail)
+            + fromemail
             + ")";
 
     var sns = new AWS.SNS();
